@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { render, Box, Text } from 'ink';
 import TextInput from 'ink-text-input';
 import Spinner from 'ink-spinner';
 import { ragQuery } from '../services/rag.js';
+import { getRandomWisdom, type WisdomSnippet } from '../services/wisdom.js';
 
 interface Message {
   id: string;
@@ -22,6 +23,39 @@ export function App() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [wisdom, setWisdom] = useState<WisdomSnippet | null>(null);
+  const wisdomIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch and rotate wisdom during loading
+  useEffect(() => {
+    if (loading) {
+      // Fetch initial wisdom
+      const fetchWisdom = async () => {
+        const newWisdom = await getRandomWisdom();
+        if (newWisdom) setWisdom(newWisdom);
+      };
+      fetchWisdom();
+
+      // Rotate wisdom every 4 seconds
+      wisdomIntervalRef.current = setInterval(async () => {
+        const newWisdom = await getRandomWisdom();
+        if (newWisdom) setWisdom(newWisdom);
+      }, 4000);
+    } else {
+      // Clear wisdom when loading stops
+      if (wisdomIntervalRef.current) {
+        clearInterval(wisdomIntervalRef.current);
+        wisdomIntervalRef.current = null;
+      }
+      setWisdom(null);
+    }
+
+    return () => {
+      if (wisdomIntervalRef.current) {
+        clearInterval(wisdomIntervalRef.current);
+      }
+    };
+  }, [loading]);
 
   const handleSubmit = async () => {
     if (!input.trim() || loading) return;
@@ -90,9 +124,24 @@ export function App() {
           </Box>
         ))}
         {loading && (
-          <Text color="yellow">
-            <Spinner type="dots" /> Thinking deeply...
-          </Text>
+          <Box flexDirection="column" borderStyle="round" borderColor="yellow" paddingX={1} paddingY={0}>
+            <Box>
+              <Text color="yellow">
+                <Spinner type="dots" />
+              </Text>
+              <Text color="yellow"> Consulting the sages...</Text>
+            </Box>
+            {wisdom && (
+              <Box flexDirection="column" marginTop={1}>
+                <Text color="cyan" italic wrap="wrap">
+                  💡 "{wisdom.text}"
+                </Text>
+                <Text color="gray" dimColor>
+                  {'   '}— {wisdom.speaker ? `${wisdom.speaker}, ` : ''}{wisdom.ref} ({wisdom.source})
+                </Text>
+              </Box>
+            )}
+          </Box>
         )}
         {error && (
           <Text color="red">
