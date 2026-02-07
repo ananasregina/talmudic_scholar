@@ -1,0 +1,42 @@
+{
+  "name": "talmudic_scholar",
+  "version": "1.0.0",
+  "description": "Talmudic Scholar AI - POC with RAG and vector search",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/ui/app.tsx",
+    "dev:tui": "tsx src/ui/app.tsx",
+    "start": "node dist/index.js",
+    "download": "tsx src/scripts/download.ts",
+    "ingest": "tsx src/scripts/ingest.ts",
+    "db:init": "tsx src/db/init.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "talmud",
+    "rag",
+    "vector-search",
+    "ai"
+  ],
+  "author": "talimoreno",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ink": "^4.4.1",
+    "ink-spinner": "^5.0.0",
+    "ink-text-input": "^5.0.1",
+    "openai": "^4.20.1",
+    "pg": "^8.11.3",
+    "pgvector": "^0.1.6",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/pg": "^8.10.9",
+    "@types/react": "^18.2.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

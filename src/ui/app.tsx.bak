@@ -1,0 +1,106 @@
+import { createInterface } from 'readline';
+import { getContextForQuery } from '../services/rag.js';
+import OpenAI from 'openai';
+import { config } from '../config.js';
+
+const zaiClient = new OpenAI({
+  baseURL: config.zai.apiUrl,
+  apiKey: config.zai.apiKey,
+});
+
+interface Message {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
+const messages: Message[] = [
+  {
+    role: 'system',
+    content: `You are a Talmudic Scholar AI, specialized in Jewish texts including Torah, Mishnah, and Talmud. 
+    You provide thoughtful, scholarly answers based on the context provided.
+    When citing sources, reference the specific text and location.
+    Always respect the wisdom and traditions embedded in these texts.`,
+  },
+];
+
+async function askAI(userMessage: string, context: string): Promise<string> {
+  const contextMessage: Message = {
+    role: 'system',
+    content: `CONTEXT FROM TALMUDIC TEXTS:\n\n${context}\n\nUse this context to inform your answer. If the context doesn't directly address the question, you may draw on your general knowledge of Talmudic texts.`,
+  };
+  
+  const allMessages = [contextMessage, ...messages, { role: 'user' as const, content: userMessage }];
+  
+  try {
+    const response = await zaiClient.chat.completions.create({
+      model: config.zai.model,
+      messages: allMessages,
+      temperature: 0.7,
+      max_tokens: 1000,
+    });
+    
+    return response.choices[0]?.message?.content || 'No response generated.';
+  } catch (error) {
+    console.error('Error calling Z.AI:', error);
+    return 'Sorry, I encountered an error while processing your request.';
+  }
+}
+
+function printMessage(role: string, content: string) {
+  const timestamp = new Date().toLocaleTimeString();
+  const separator = role === 'user' ? '>>>' : '<<<';
+  
+  console.log(`\n[${timestamp}] ${separator} ${role}:`);
+  console.log(content);
+  console.log('─'.repeat(60));
+}
+
+async function chatLoop() {
+  const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  
+  console.log('═══════════════════════════════════════════════════════════');
+  console.log('           TALMUDIC SCHOLAR AI - POC DEMO');
+  console.log('═══════════════════════════════════════════════════════════');
+  console.log('\nAsk questions about Torah, Mishnah, and Talmud.');
+  console.log('Type "quit" or "exit" to leave.\n');
+  
+  const askQuestion = (prompt: string): Promise<string> => {
+    return new Promise((resolve) => {
+      rl.question(prompt, resolve);
+    });
+  };
+  
+  try {
+    while (true) {
+      const question = await askQuestion('\nYour question: ');
+      
+      const trimmedQuestion = question.trim();
+      
+      if (!trimmedQuestion) continue;
+      
+      if (trimmedQuestion.toLowerCase() === 'quit' || trimmedQuestion.toLowerCase() === 'exit') {
+        console.log('\nShalom! May your studies be blessed. 📜✨\n');
+        break;
+      }
+      
+      printMessage('user', trimmedQuestion);
+      messages.push({ role: 'user', content: trimmedQuestion });
+      
+      console.log('\n📚 Searching Talmudic corpus...');
+      const context = await getContextForQuery(trimmedQuestion, 3);
+      
+      console.log('🤖 Thinking...');
+      const answer = await askAI(trimmedQuestion, context);
+      
+      printMessage('assistant', answer);
+      messages.push({ role: 'assistant', content: answer });
+    }
+  } finally {
+    rl.close();
+  }
+}
+
+chatLoop().catch(console.error);
