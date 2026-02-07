@@ -65,25 +65,27 @@ export function App() {
         </Text>
       </Box>
 
-      <Box flexDirection="column" marginBottom={1}>
+      <Box flexDirection="column" marginBottom={1} flexGrow={1}>
         {messages.slice(-10).map((msg) => (
           <Box key={msg.id} flexDirection="column" marginBottom={1}>
             {msg.role === 'system' ? (
-              <Text color="gray" italic>
+              <Text color="gray" italic wrap="wrap">
                 ℹ️ {msg.content}
               </Text>
             ) : (
-              <>
-                <Text color={msg.role === 'user' ? 'green' : 'white'}>
+              <Box flexDirection="column">
+                <Text color={msg.role === 'user' ? 'green' : 'white'} wrap="wrap">
                   {msg.role === 'user' ? '> ' : '📜 '}
+                </Text>
+                <Text color={msg.role === 'user' ? 'green' : 'white'} wrap="wrap">
                   {msg.content}
                 </Text>
                 {msg.sources && msg.sources.length > 0 && (
-                  <Text color="yellow">
+                  <Text color="yellow" wrap="wrap">
                     {'  '}Sources: {msg.sources.join(', ')}
                   </Text>
                 )}
-              </>
+              </Box>
             )}
           </Box>
         ))}

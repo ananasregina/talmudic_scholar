@@ -216,7 +216,7 @@ export async function generateResponse(
         },
       ],
       temperature: 0.7,
-      max_tokens: 3000,
+      max_tokens: 8000,
       // @ts-ignore - Z.AI specific parameter for Max Reasoning / Preserved Thinking
       clear_thinking: false,
     });
