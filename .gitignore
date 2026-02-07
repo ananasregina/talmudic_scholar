@@ -145,3 +145,4 @@ data/raw/*.json
 !data/raw/.gitkeep
 
 posgtresql-create-db.sh
+.DS_Store
