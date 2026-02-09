@@ -34,8 +34,8 @@ export interface LegacySearchResult {
  */
 export async function search(
   query: string,
-  topK: number = 5,
-  minSimilarity: number = 0.4
+  topK: number = 20,
+  minSimilarity: number = 0.2
 ): Promise<SearchResult[]> {
   try {
     const queryEmbedding = await generateEmbedding(query);
@@ -334,7 +334,9 @@ export async function generateResponse(
  */
 export async function ragQuery(query: string): Promise<string> {
   try {
-    const context = await search(query, 5, 0.4);
+    // Increase results to allow for deep analysis, using a portion of the context window
+    // Assuming ~300 tokens per chunk, 50 chunks is ~15k tokens, well within 200k
+    const context = await search(query, 50, 0.2);
 
     if (context.length === 0) {
       return 'I could not find relevant Talmudic sources. Please rephrase your question.';

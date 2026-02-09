@@ -183,4 +183,6 @@ function extractSources(response: string): string[] {
 }
 
 // Render the application
-render(<App />);
+export function run() {
+  render(<App />);
+}

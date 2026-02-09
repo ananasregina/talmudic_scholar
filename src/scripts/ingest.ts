@@ -58,9 +58,9 @@ function normalizeSefariaData(data: SefariaData): SefariaDataWithHebrew {
     return data as SefariaDataWithHebrew;
   }
 
-  // Convert string[] (array of arrays) to string[][]
-  const normalizedText = data.text as string[];
-  const normalizedHe = data.he ? (data.he as string[][][]).map(h => h) : undefined;
+  // Handle case where text is string[] but should be string[][] (one chapter)
+  const normalizedText = [data.text] as unknown as (string[] | string[][])[];
+  const normalizedHe = data.he ? [data.he] as unknown as (string[] | string[][])[] : undefined;
 
   return {
     ...data,
@@ -147,8 +147,10 @@ function chunkTorah(sefariaData: SefariaDataWithHebrew): TextChunk[] {
     const hebrewVerses = normalizedData.he ? normalizedData.he[chapter] : [];
 
     for (let verse = 0; verse < verses.length; verse++) {
-      const english = stripHtml(verses[verse] || '');
-      const hebrew = hebrewVerses[verse] ? stripHtml(hebrewVerses[verse]) : '';
+      const verseContent = verses[verse];
+      const english = stripHtml(Array.isArray(verseContent) ? verseContent.join(' ') : (verseContent || ''));
+      const hebrewVerseContent = hebrewVerses[verse];
+      const hebrew = hebrewVerseContent ? stripHtml(Array.isArray(hebrewVerseContent) ? hebrewVerseContent.join(' ') : hebrewVerseContent) : '';
       const content = english || hebrew;
 
       if (!content) continue;
@@ -186,8 +188,10 @@ function chunkMishnah(sefariaData: SefariaDataWithHebrew): TextChunk[] {
     const hebrewMishnayot = normalizedData.he ? normalizedData.he[chapter] : [];
 
     for (let mishnah = 0; mishnah < mishnayot.length; mishnah++) {
-      const english = stripHtml(mishnayot[mishnah] || '');
-      const hebrew = hebrewMishnayot[mishnah] ? stripHtml(hebrewMishnayot[mishnah]) : '';
+      const mishnahContent = mishnayot[mishnah];
+      const english = stripHtml(Array.isArray(mishnahContent) ? mishnahContent.join(' ') : (mishnahContent || ''));
+      const hebrewMishnahContent = hebrewMishnayot[mishnah];
+      const hebrew = hebrewMishnahContent ? stripHtml(Array.isArray(hebrewMishnahContent) ? hebrewMishnahContent.join(' ') : hebrewMishnahContent) : '';
       const content = english || hebrew;
 
       if (!content) continue;
@@ -247,8 +251,10 @@ function chunkTalmud(sefariaData: SefariaDataWithHebrew): TextChunk[] {
     let chunkIndex = 0;
 
     for (let line = 0; line < lines.length; line++) {
-      const english = stripHtml(lines[line] || '');
-      const hebrew = hebrewLines[line] ? stripHtml(hebrewLines[line]) : '';
+      const lineContent = lines[line];
+      const english = stripHtml(Array.isArray(lineContent) ? lineContent.join(' ') : (lineContent || ''));
+      const hebrewLineContent = hebrewLines[line];
+      const hebrew = hebrewLineContent ? stripHtml(Array.isArray(hebrewLineContent) ? hebrewLineContent.join(' ') : hebrewLineContent) : '';
       const content = english || hebrew;
 
       if (!content) continue;

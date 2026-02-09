@@ -14,6 +14,7 @@ export { ragQuery };
 import { closePool } from './db/init.js';
 import { marked } from 'marked';
 import TerminalRenderer from 'marked-terminal';
+import { run as runTUI } from './ui/app.js';
 
 // @ts-ignore
 marked.setOptions({
@@ -77,73 +78,11 @@ function printHeader(): void {
 
 function printCommands(): void {
   console.log('\n📚 Available Commands:');
-  console.log('  npm run db:init    - Initialize PostgreSQL database with pgvector');
-  console.log('  npm run download   - Download Talmudic texts from Sefaria');
-  console.log('  npm run ingest     - Ingest documents with vector embeddings');
-  console.log('  npm run dev         - Launch the TUI interface\n');
-}
-
-// ============================================================================
-// CLI INTERACTIVE MODE
-// ============================================================================
-
-async function interactiveMode(): Promise<void> {
-  printHeader();
-  printCommands();
-
-  console.log('💡 Type your question or "exit" to quit.\n');
-
-  // Read from stdin
-  process.stdin.setEncoding('utf-8');
-  process.stdin.resume();
-
-  let buffer = '';
-
-  process.stdin.on('data', async (chunk: Buffer) => {
-    buffer += chunk.toString();
-
-    // Process complete lines
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
-
-    for (const line of lines) {
-      const query = line.trim();
-
-      if (!query) continue;
-
-      if (query.toLowerCase() === 'exit' || query.toLowerCase() === 'quit') {
-        await shutdown('user requested exit');
-        return;
-      }
-
-      if (query.toLowerCase() === 'help') {
-        printCommands();
-        continue;
-      }
-
-      try {
-        console.log(`\n🤔 Query: ${query}`);
-        console.log('⏳ Searching Talmudic texts and generating response...\n');
-
-        const answer = await ragQuery(query);
-
-        console.log('📜 Response:');
-        console.log('─'.repeat(60));
-        console.log(marked.parse(answer));
-        console.log('─'.repeat(60) + '\n');
-      } catch (error: any) {
-        console.error('❌ Error processing query:', error.message);
-        if (error.message?.includes('database')) {
-          console.error('💡 Hint: Make sure PostgreSQL is running and initialized with: npm run db:init');
-        } else if (error.message?.includes('embedding')) {
-          console.error('💡 Hint: Make sure LM Studio is running on http://127.0.0.1:1338');
-        } else if (error.message?.includes('API')) {
-          console.error('💡 Hint: Check your ZAI_API_KEY in .env file');
-        }
-        console.log('');
-      }
-    }
-  });
+  console.log('  talmudic-scholar             - Launch the TUI interface (default)');
+  console.log('  talmudic-scholar query "..."  - Query via CLI');
+  console.log('  npm run db:init              - Initialize PostgreSQL database');
+  console.log('  npm run download             - Download Talmudic texts');
+  console.log('  npm run ingest               - Ingest documents\n');
 }
 
 // ============================================================================
@@ -153,10 +92,9 @@ async function interactiveMode(): Promise<void> {
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
 
-  // Check if running directly (should use TUI interface)
+  // Check if running directly - launch TUI
   if (args.length === 0) {
-    console.log('ℹ️  Running in CLI mode. For the full TUI interface, use: npm run dev');
-    await interactiveMode();
+    runTUI();
     return;
   }
 

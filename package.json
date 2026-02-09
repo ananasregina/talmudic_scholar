@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Talmudic Scholar AI - POC with RAG and vector search",
   "main": "dist/index.js",
+  "bin": {
+    "talmudic-scholar": "dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/ui/app.tsx",
@@ -11,7 +14,7 @@
     "download": "tsx src/scripts/download.ts",
     "ingest": "tsx src/scripts/ingest.ts",
     "db:init": "tsx src/db/init.ts",
-    "query": "tsx src/index.ts query",
+    "query": "node dist/index.js query",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

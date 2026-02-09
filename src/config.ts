@@ -20,6 +20,7 @@ export interface Config {
     apiKey: string;
     apiUrl: string;
     model: string;
+    contextWindowMaxTokens: number;
   };
 }
 
@@ -33,7 +34,7 @@ export const config: Config = {
   },
   embeddings: {
     url: process.env.EMBEDDING_URL || 'http://127.0.0.1:1338/v1',
-    model: process.env.EMBEDDING_MODEL || 'text-embedding-nomic-embed-text-v1.5-embedding',
+    model: process.env.EMBEDDING_MODEL || 'text-embedding-bge-m3',
     dimension: parseInt(process.env.EMBEDDING_DIMENSION || '768'),
     chunkSizeBytes: parseInt(process.env.EMBEDDING_CHUNK_SIZE_BYTES || '1024'),
   },
@@ -41,5 +42,6 @@ export const config: Config = {
     apiKey: process.env.ZAI_API_KEY || '',
     apiUrl: process.env.ZAI_API_URL || 'https://open.bigmodel.cn/api/paas/v4/',
     model: process.env.ZAI_MODEL || 'glm-4-plus',
+    contextWindowMaxTokens: parseInt(process.env.CONTEXT_WINDOW_MAX_TOKENS || '200000'),
   },
 };

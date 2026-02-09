@@ -16,13 +16,13 @@ export interface DownloadTarget {
   priority: number;
 }
 
-interface DownloadProgress {
-  target: DownloadTarget;
-  downloaded: number;
-  total: number;
-  speed: number; // bytes/sec
-  eta: number; // seconds remaining
-}
+// interface DownloadProgress {
+//   target: DownloadTarget;
+//   downloaded: number;
+//   total: number;
+//   speed: number; // bytes/sec
+//   eta: number; // seconds remaining
+// }
 
 interface DownloadResult {
   target: DownloadTarget;
@@ -216,7 +216,7 @@ async function saveChecksums(checksums: Map<string, string>): Promise<void> {
 interface DownloadOptionsInternal {
   url: string;
   filePath: string;
-  onProgress?: (progress: number, speed: number, eta: number) => void;
+  onProgress?: (downloaded: number, total: number, speed: number, eta: number) => void;
 }
 
 async function downloadWithProgress(options: DownloadOptionsInternal): Promise<void> {
@@ -253,7 +253,7 @@ async function downloadWithProgress(options: DownloadOptionsInternal): Promise<v
           const speed = downloaded / elapsed; // bytes/sec
           const eta = (total - downloaded) / speed;
 
-          onProgress?.(downloaded, speed, eta);
+          onProgress?.(downloaded, total, speed, eta);
           lastProgressTime = now;
         }
       });
@@ -318,8 +318,8 @@ async function downloadWithRetry(
       await downloadWithProgress({
         url,
         filePath,
-        onProgress: (downloaded, speed, eta) => {
-          const percent = ((downloaded / (parseFloat(process.stdout.columns as unknown as number) * 100)) * 100).toFixed(1);
+        onProgress: (downloaded, total, speed, eta) => {
+          const percent = total > 0 ? ((downloaded / total) * 100).toFixed(1) : '0.0';
           const speedMB = (speed / 1024 / 1024).toFixed(2);
           const etaMin = Math.ceil(eta / 60);
           process.stdout.write(`\r[${attempt}/${maxAttempts}] ${target.filename} - ${percent}% - ${speedMB} MB/s - ETA: ${etaMin}min `);

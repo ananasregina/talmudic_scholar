@@ -1,6 +1,6 @@
 import { Pool, PoolConfig } from 'pg';
 import { config as dotenvConfig } from 'dotenv';
-import { SQL } from './schema';
+import { SQL } from './schema.js';
 
 dotenvConfig();
 
