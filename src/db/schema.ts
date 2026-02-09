@@ -1,3 +1,5 @@
+import { config } from '../config.js';
+
 export const SQL = {
   CREATE_EXTENSION: `
     CREATE EXTENSION IF NOT EXISTS vector;
@@ -18,7 +20,7 @@ export const SQL = {
       lines_end INTEGER,
       speaker TEXT,                      -- "Rabbi Meir" | "Rabbi Judah"
       metadata JSONB,                    -- Flexible: {language, layer, speakers, topics}
-      embedding VECTOR(768),
+      embedding VECTOR(${config.embeddings.dimension}),
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     );

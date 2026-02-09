@@ -10,7 +10,15 @@
  */
 
 import { ragQuery } from './services/rag.js';
+export { ragQuery };
 import { closePool } from './db/init.js';
+import { marked } from 'marked';
+import TerminalRenderer from 'marked-terminal';
+
+// @ts-ignore
+marked.setOptions({
+  renderer: new TerminalRenderer() as any
+});
 
 // ============================================================================
 // ERROR HANDLING & GRACEFUL SHUTDOWN
@@ -121,7 +129,7 @@ async function interactiveMode(): Promise<void> {
 
         console.log('📜 Response:');
         console.log('─'.repeat(60));
-        console.log(answer);
+        console.log(marked.parse(answer));
         console.log('─'.repeat(60) + '\n');
       } catch (error: any) {
         console.error('❌ Error processing query:', error.message);
@@ -165,17 +173,23 @@ async function main(): Promise<void> {
 
     case 'query':
       if (args.length < 2) {
-        console.error('❌ Usage: node index.ts query "your question"');
+        console.error('❌ Usage: npm run query -- "your question"');
         process.exit(1);
       }
       const query = args.slice(1).join(' ');
       try {
-        printHeader();
+        console.log('\n' + '─'.repeat(60));
+        console.log('📜 The Havruta prepares to share the wisdom of our ancestors...');
+        console.log('🤔 Query: ' + query);
+        console.log('─'.repeat(60));
+
         const answer = await ragQuery(query);
-        console.log('\n📜 Response:');
+
+        console.log('\n📚 Insight from the Talmudic Tradition:');
         console.log('─'.repeat(60));
-        console.log(answer);
-        console.log('─'.repeat(60));
+        console.log(marked.parse(answer));
+        console.log('─'.repeat(60) + '\n');
+
         await shutdown('query completed');
       } catch (error: any) {
         console.error('❌ Error:', error.message);

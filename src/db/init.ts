@@ -53,3 +53,17 @@ export async function initDatabase(): Promise<void> {
 export async function closePool(): Promise<void> {
   await pool.end();
 }
+
+// Run if executed directly
+const isDirectRun = import.meta.url === `file://${process.argv[1]}`;
+if (isDirectRun) {
+  initDatabase()
+    .then(() => {
+      console.log('✓ Initialization complete');
+      process.exit(0);
+    })
+    .catch((err) => {
+      console.error('✗ Initialization failed:', err);
+      process.exit(1);
+    });
+}

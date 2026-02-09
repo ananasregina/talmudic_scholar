@@ -3,6 +3,13 @@ import { render, Box, Text } from 'ink';
 import TextInput from 'ink-text-input';
 import Spinner from 'ink-spinner';
 import { ragQuery } from '../services/rag.js';
+import { marked } from 'marked';
+import TerminalRenderer from 'marked-terminal';
+
+// @ts-ignore
+marked.setOptions({
+  renderer: new TerminalRenderer() as any
+});
 import { getRandomWisdom, type WisdomSnippet } from '../services/wisdom.js';
 
 interface Message {
@@ -112,7 +119,7 @@ export function App() {
                   {msg.role === 'user' ? '> ' : '📜 '}
                 </Text>
                 <Text color={msg.role === 'user' ? 'green' : 'white'} wrap="wrap">
-                  {msg.content}
+                  {msg.role === 'user' ? msg.content : (marked.parse(msg.content) as string)}
                 </Text>
                 {msg.sources && msg.sources.length > 0 && (
                   <Text color="yellow" wrap="wrap">
