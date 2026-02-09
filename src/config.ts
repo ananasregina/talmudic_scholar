@@ -16,10 +16,11 @@ export interface Config {
     dimension: number;
     chunkSizeBytes: number;
   };
-  zai: {
+  llm: {
     apiKey: string;
     apiUrl: string;
     model: string;
+    reasoningEffort: string;
     contextWindowMaxTokens: number;
   };
 }
@@ -38,10 +39,11 @@ export const config: Config = {
     dimension: parseInt(process.env.EMBEDDING_DIMENSION || '768'),
     chunkSizeBytes: parseInt(process.env.EMBEDDING_CHUNK_SIZE_BYTES || '1024'),
   },
-  zai: {
-    apiKey: process.env.ZAI_API_KEY || '',
-    apiUrl: process.env.ZAI_API_URL || 'https://open.bigmodel.cn/api/paas/v4/',
-    model: process.env.ZAI_MODEL || 'glm-4-plus',
+  llm: {
+    apiKey: process.env.LLM_API_KEY || '',
+    apiUrl: process.env.LLM_API_URL || 'https://openrouter.ai/api/v1',
+    model: process.env.LLM_MODEL || 'openrouter/pony-alpha',
+    reasoningEffort: process.env.LLM_REASONING_EFFORT || 'xhigh',
     contextWindowMaxTokens: parseInt(process.env.CONTEXT_WINDOW_MAX_TOKENS || '200000'),
   },
 };

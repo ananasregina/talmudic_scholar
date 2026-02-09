@@ -288,8 +288,8 @@ When in doubt about how to respond, remember:
  * GLM 4.7 LLM client for Z.AI
  */
 const llmClient = new OpenAI({
-  apiKey: config.zai.apiKey,
-  baseURL: config.zai.apiUrl,
+  apiKey: config.llm.apiKey,
+  baseURL: config.llm.apiUrl,
 });
 
 /**
@@ -305,7 +305,7 @@ export async function generateResponse(
       .join('\n\n');
 
     const response = await llmClient.chat.completions.create({
-      model: config.zai.model,
+      model: config.llm.model,
       messages: [
         {
           role: 'system',
@@ -317,9 +317,9 @@ export async function generateResponse(
         },
       ],
       temperature: 0.7,
-      max_tokens: 8000,
-      // @ts-ignore - Z.AI specific parameter for Max Reasoning / Preserved Thinking
-      clear_thinking: false,
+      max_tokens: 16000,
+      // @ts-ignore - OpenRouter specific parameter for Max Reasoning / Preserved Thinking
+      reasoning: { effort: config.llm.reasoningEffort },
     });
 
     return response.choices[0].message.content || 'I apologize, but I could not generate a response.';
