@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1E3A5F">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Talmudic Scholar</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon fill='%231E3A5F' points='50,10 60,40 90,40 66,58 76,88 50,70 24,88 34,58 10,40 40,40'/></svg>">
+  <style>
+    :root {
+      --bg: #F5F0E6;
+      --fg: #2C2C2C;
+      --accent: #1E3A5F;
+      --secondary: #8B2635;
+      --card: #FFFDF8;
+      --border: #E0D8C8;
+      --muted: #6B6560;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Hebrew', 'Arial Hebrew', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    header {
+      background: linear-gradient(135deg, var(--accent) 0%, #2A4A6F 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+    
+    .star {
+      width: 40px;
+      height: 40px;
+      opacity: 0.9;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      direction: rtl;
+    }
+    
+    .subtitle {
+      font-size: 1rem;
+      opacity: 0.85;
+      margin-top: 0.25rem;
+      font-weight: 400;
+    }
+    
+    main {
+      flex: 1;
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .response-container {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      min-height: 300px;
+      max-height: 60vh;
+      overflow-y: auto;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+    
+    .placeholder {
+      color: var(--muted);
+      font-style: italic;
+      text-align: center;
+      padding-top: 4rem;
+    }
+    
+    .error {
+      color: var(--secondary);
+    }
+    
+    .query-form {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    input[type="text"] {
+      flex: 1;
+      padding: 1rem 1.25rem;
+      font-size: 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: var(--card);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+    }
+    
+    button {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    
+    button:hover {
+      background: #152D4A;
+    }
+    
+    button:active {
+      transform: scale(0.98);
+    }
+    
+    button:disabled {
+      background: var(--muted);
+      cursor: not-allowed;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 4rem auto;
+    }
+    
+    .wisdom {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(30, 58, 95, 0.05);
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .wisdom-text {
+      font-style: italic;
+      color: var(--accent);
+    }
+    
+    .wisdom-source {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 1rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    
+    /* Markdown styling */
+    .response-container h1,
+    .response-container h2,
+    .response-container h3,
+    .response-container h4 {
+      color: var(--accent);
+      margin: 1.5rem 0 0.75rem 0;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    
+    .response-container h1 { font-size: 1.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+    .response-container h2 { font-size: 1.3rem; }
+    .response-container h3 { font-size: 1.15rem; }
+    .response-container h4 { font-size: 1rem; }
+    
+    .response-container h1:first-child,
+    .response-container h2:first-child,
+    .response-container h3:first-child {
+      margin-top: 0;
+    }
+    
+    .response-container p {
+      margin: 0.75rem 0;
+    }
+    
+    .response-container p:first-child {
+      margin-top: 0;
+    }
+    
+    .response-container strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    .response-container em {
+      color: var(--secondary);
+      font-style: italic;
+    }
+    
+    .response-container ul,
+    .response-container ol {
+      margin: 0.75rem 0;
+      padding-left: 1.5rem;
+    }
+    
+    .response-container li {
+      margin: 0.4rem 0;
+    }
+    
+    .response-container li::marker {
+      color: var(--accent);
+    }
+    
+    .response-container blockquote {
+      margin: 1rem 0;
+      padding: 0.75rem 1rem;
+      border-left: 4px solid var(--secondary);
+      background: rgba(139, 38, 53, 0.05);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: var(--fg);
+    }
+    
+    .response-container blockquote p {
+      margin: 0;
+    }
+    
+    .response-container code {
+      background: rgba(30, 58, 95, 0.1);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+      font-size: 0.9em;
+      color: var(--secondary);
+    }
+    
+    .response-container pre {
+      background: #2C2C2C;
+      color: #F5F0E6;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    
+    .response-container pre code {
+      background: transparent;
+      padding: 0;
+      color: inherit;
+    }
+    
+    .response-container hr {
+      border: none;
+      border-top: 2px solid var(--border);
+      margin: 1.5rem 0;
+    }
+    
+    .response-container a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    
+    .response-container a:hover {
+      color: var(--secondary);
+    }
+    
+    .response-container table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    
+    .response-container th,
+    .response-container td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    
+    .response-container th {
+      background: rgba(30, 58, 95, 0.1);
+      font-weight: 600;
+    }
+    
+    @media (max-width: 600px) {
+      header { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.5rem; }
+      main { padding: 1rem; }
+      .query-form { flex-direction: column; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <svg class="star" viewBox="0 0 100 100">
+        <polygon fill="currentColor" points="50,5 61,38 95,38 68,58 79,91 50,71 21,91 32,58 5,38 39,38"/>
+      </svg>
+      <div>
+        <h1>תלמוד חכם</h1>
+        <p class="subtitle">Talmudic Scholar</p>
+      </div>
+    </div>
+  </header>
+  
+  <main>
+    <div class="response-container" id="response">
+      <p class="placeholder">Ask a question about Torah, Talmud, Mishnah, or Jewish law...</p>
+    </div>
+    
+    <form class="query-form" id="form">
+      <input type="text" id="input" placeholder="What does Berakhot 2a discuss?" autocomplete="off">
+      <button type="submit" id="submit">Ask</button>
+    </form>
+  </main>
+  
+  <footer>
+    <p>AI-Powered Talmudic Research Assistant</p>
+  </footer>
+  
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+    
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+    const response = document.getElementById('response');
+    const submitBtn = document.getElementById('submit');
+    
+    const wisdomQuotes = [
+      { text: "Turn it over and turn it over, for all is therein.", source: "Pirkei Avot 5:22" },
+      { text: "The day is short, the work is great...", source: "Pirkei Avot 2:15" },
+      { text: "Who is wise? One who learns from every person.", source: "Pirkei Avot 4:1" },
+      { text: "Study is not the ultimate goal, but action is.", source: "Pirkei Avot 1:17" },
+      { text: "Make your study of Torah a fixed habit.", source: "Pirkei Avot 1:15" },
+      { text: "If I am not for myself, who will be for me?", source: "Pirkei Avot 1:14" },
+      { text: "You are not obligated to complete the work...", source: "Pirkei Avot 2:16" },
+      { text: "In a place where there are no men, strive to be a man.", source: "Pirkei Avot 2:5" }
+    ];
+    
+    let wisdomInterval = null;
+    
+    function showLoading() {
+      const randomWisdom = wisdomQuotes[Math.floor(Math.random() * wisdomQuotes.length)];
+      response.innerHTML = '<div class="spinner"></div><div class="wisdom"><p class="wisdom-text">"' + randomWisdom.text + '"</p><p class="wisdom-source">— ' + randomWisdom.source + '</p></div>';
+      
+      wisdomInterval = setInterval(function() {
+        const wisdom = wisdomQuotes[Math.floor(Math.random() * wisdomQuotes.length)];
+        const wisdomDiv = response.querySelector('.wisdom');
+        if (wisdomDiv) {
+          wisdomDiv.innerHTML = '<p class="wisdom-text">"' + wisdom.text + '"</p><p class="wisdom-source">— ' + wisdom.source + '</p>';
+        }
+      }, 4000);
+    }
+    
+    function hideLoading() {
+      if (wisdomInterval) {
+        clearInterval(wisdomInterval);
+        wisdomInterval = null;
+      }
+    }
+    
+    function parseMarkdown(text) {
+      var html = text;
+      
+      html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+      
+      html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+      html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+      html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+      html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+      
+      html = html.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+      html = html.replace(/___([^_]+)___/g, '<strong><em>$1</em></strong>');
+      html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+      html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
+      
+      html = html.replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>');
+      html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+      html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+      html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+      
+      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      
+      html = html.replace(/^---$/gm, '<hr>');
+      
+      html = html.replace(/\n\n/g, '</p><p>');
+      html = html.replace(/\n/g, '<br>');
+      
+      html = '<p>' + html + '</p>';
+      
+      html = html.replace(/<p><\/p>/g, '');
+      html = html.replace(/<p>(<h[1-4]>)/g, '$1');
+      html = html.replace(/(<\/h[1-4]>)<\/p>/g, '$1');
+      html = html.replace(/<p>(<ul>)/g, '$1');
+      html = html.replace(/(<\/ul>)<\/p>/g, '$1');
+      html = html.replace(/<p>(<ol>)/g, '$1');
+      html = html.replace(/(<\/ol>)<\/p>/g, '$1');
+      html = html.replace(/<p>(<pre>)/g, '$1');
+      html = html.replace(/(<\/pre>)<\/p>/g, '$1');
+      html = html.replace(/<p>(<blockquote>)/g, '$1');
+      html = html.replace(/(<\/blockquote>)<\/p>/g, '$1');
+      html = html.replace(/<p>(<hr>)/g, '$1');
+      html = html.replace(/(<hr>)<\/p>/g, '$1');
+      html = html.replace(/<br><br>/g, '</p><p>');
+      
+      return html;
+    }
+    
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var query = input.value.trim();
+      if (!query) return;
+      
+      submitBtn.disabled = true;
+      showLoading();
+      
+      try {
+        var res = await fetch('/api/query?q=' + encodeURIComponent(query));
+        var data = await res.json();
+        
+        hideLoading();
+        
+        if (data.error) {
+          response.innerHTML = '<p class="error">Error: ' + data.error + '</p>';
+        } else {
+          response.innerHTML = parseMarkdown(data.answer);
+        }
+      } catch (err) {
+        hideLoading();
+        response.innerHTML = '<p class="error">Unable to connect. Please check that the server is running.</p>';
+      } finally {
+        submitBtn.disabled = false;
+        input.focus();
+      }
+    });
+    
+    input.focus();
+  </script>
+</body>
+</html>

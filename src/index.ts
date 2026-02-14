@@ -78,11 +78,12 @@ function printHeader(): void {
 
 function printCommands(): void {
   console.log('\n📚 Available Commands:');
-  console.log('  talmudic-scholar             - Launch the TUI interface (default)');
-  console.log('  talmudic-scholar query "..."  - Query via CLI');
-  console.log('  npm run db:init              - Initialize PostgreSQL database');
-  console.log('  npm run download             - Download Talmudic texts');
-  console.log('  npm run ingest               - Ingest documents\n');
+  console.log('  talmudic-scholar                  - Launch the TUI interface (default)');
+  console.log('  talmudic-scholar web [options]    - Start web server');
+  console.log('  talmudic-scholar query "..."      - Query via CLI');
+  console.log('\n📦 Web Server Options:');
+  console.log('  -p, --port <number>   - Specify port (default: 3000)');
+  console.log('  --help                - Show this help\n');
 }
 
 // ============================================================================
@@ -134,6 +135,28 @@ async function main(): Promise<void> {
         process.exit(1);
       }
       break;
+
+    case 'web': {
+      let port = 3000;
+      for (let i = 1; i < args.length; i++) {
+        if ((args[i] === '-p' || args[i] === '--port') && args[i + 1]) {
+          port = parseInt(args[i + 1], 10);
+          if (isNaN(port) || port < 1 || port > 65535) {
+            console.error('❌ Invalid port number');
+            process.exit(1);
+          }
+          i++;
+        } else if (args[i] === '--help' || args[i] === '-h') {
+          printHeader();
+          printCommands();
+          process.exit(0);
+        }
+      }
+      
+      process.env.PORT = String(port);
+      await import('./web/server.js');
+      break;
+    }
 
     default:
       console.error(`❌ Unknown command: ${command}`);

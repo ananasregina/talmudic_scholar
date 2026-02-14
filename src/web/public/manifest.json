@@ -1,0 +1,24 @@
+{
+  "name": "Talmudic Scholar",
+  "short_name": "TalmudScholar",
+  "description": "AI-Powered Talmudic Research Assistant",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F0E6",
+  "theme_color": "#1E3A5F",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%231E3A5F' width='512' height='512' rx='64'/><polygon fill='%23F5F0E6' points='256,64 288,160 384,160 304,224 336,320 256,256 176,320 208,224 128,160 224,160'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%231E3A5F' width='192' height='192' rx='24'/><polygon fill='%23F5F0E6' points='96,24 108,60 144,60 116,84 128,120 96,96 64,120 76,84 48,60 84,60'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

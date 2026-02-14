@@ -10,6 +10,7 @@
     "build": "tsc",
     "dev": "tsx src/ui/app.tsx",
     "dev:tui": "tsx src/ui/app.tsx",
+    "dev:web": "tsx src/web/server.ts",
     "start": "node dist/index.js",
     "download": "tsx src/scripts/download.ts",
     "ingest": "tsx src/scripts/ingest.ts",
@@ -27,7 +28,9 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
+    "@hono/node-server": "^1.19.9",
     "dotenv": "^16.3.1",
+    "hono": "^4.11.9",
     "ink": "^4.4.1",
     "ink-spinner": "^5.0.0",
     "ink-text-input": "^5.0.1",
